@@ -129,7 +129,7 @@ return [
      * Should Firewall use the database?
      */
 
-    'use_database' => false,
+    'use_database' => true,
 
     /*
      * Models
@@ -160,7 +160,7 @@ return [
      *
      */
 
-    'geoip_database_path' => __DIR__.'/geoip', //storage_path('geoip'),
+    'geoip_database_path' => storage_path('geoip'),
 
     /*
      * Block suspicious attacks
@@ -179,7 +179,7 @@ return [
         'allowed_frequency' => [
 
             'ip' => [
-                'requests' => 50,
+                'requests' => env('FIREWALL_ATTACK_BLOCKER_ALLOWED_FREQUENCY_IP_REQUESTS', 50),
 
                 'seconds' => 1 * 60, // 1 minute
             ],
@@ -240,6 +240,10 @@ return [
                 'title' => 'First URI offended',
             ],
 
+            'ip_address' => [
+                'title' => 'IP address',
+            ],
+
             'blacklisted' => [
                 'title' => 'Was it blacklisted?',
             ],
@@ -266,26 +270,24 @@ return [
         'route' => '',
 
         'from' => [
-            'name' => 'Laravel Firewall',
+            'name' => 'Firewall '.env('APP_NAME'),
 
-            'address' => 'firewall@mydomain.com',
-
-            'icon_emoji' => ':fire:',
+            'address' => env('MAIL_FROM_ADDRESS'),
         ],
 
         'users' => [
             'model' => PragmaRX\Firewall\Vendor\Laravel\Models\User::class,
 
             'emails' => [
-                'admin@mydomain.com',
+                env('MAIL_ADMIN_ADDRESS'),
             ],
         ],
 
         'channels' => [
-            'slack' => [
+            /*'slack' => [
                 'enabled' => true,
                 'sender'  => PragmaRX\Firewall\Notifications\Channels\Slack::class,
-            ],
+            ],*/
 
             'mail' => [
                 'enabled' => true,

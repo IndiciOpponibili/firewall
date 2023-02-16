@@ -73,33 +73,27 @@ class AttackBlocker
     /**
      * Blacklist the IP address.
      *
-     * @param $record
+     * @param array $record
      *
-     * @return bool
+     * @return array
      */
-    protected function blacklist($record)
-    {
-        if ($record['isBlacklisted']) {
-            return false;
+    protected function blacklist(array $record): array {
+        if (!$record['isBlacklisted']) {
+
+            $blacklistUnknown = $this->config()->get("attack_blocker.action.{$record['type']}.blacklist_unknown");
+
+            $blackWhitelisted = $this->config()->get("attack_blocker.action.{$record['type']}.blacklist_whitelisted");
+
+            if ($blacklistUnknown || $blackWhitelisted) {
+                $ipAddress = $record['type'] == 'country' ? 'country:'.$record['country_code'] : $record['ipAddress'];
+
+                $this->firewall->blacklist($ipAddress, $blackWhitelisted);
+
+                $record = $this->save($record['type'], ['isBlackListed' => true]);
+            }
         }
 
-        $blacklistUnknown = $this->config()->get("attack_blocker.action.{$record['type']}.blacklist_unknown");
-
-        $blackWhitelisted = $this->config()->get("attack_blocker.action.{$record['type']}.blacklist_whitelisted");
-
-        if ($blacklistUnknown || $blackWhitelisted) {
-            $record['isBlacklisted'] = true;
-
-            $ipAddress = $record['type'] == 'country' ? 'country:'.$record['country_code'] : $record['ipAddress'];
-
-            $this->firewall->blacklist($ipAddress, $blackWhitelisted);
-
-            $this->save($record);
-
-            return true;
-        }
-
-        return false;
+        return $record;
     }
 
     /**
@@ -474,11 +468,10 @@ class AttackBlocker
      *
      * @param $record
      *
-     * @return void
+     * @return array
      */
-    protected function renew($record)
-    {
-        $this->save($record['type'], ['lastRequestAt' => $this->now()]);
+    protected function renew($record): array {
+        return $this->save($record['type'], ['lastRequestAt' => $this->now()]);
     }
 
     /**
@@ -488,7 +481,7 @@ class AttackBlocker
      *
      * @return void
      */
-    public function setFirewall($firewall)
+    public function setFirewall(Firewall $firewall)
     {
         $this->firewall = $firewall;
     }
@@ -501,8 +494,7 @@ class AttackBlocker
      *
      * @return array
      */
-    protected function save($type, $items = [])
-    {
+    protected function save($type, array $items = []): array {
         if (is_array($type)) {
             $items = $type;
 
@@ -523,9 +515,9 @@ class AttackBlocker
      */
     protected function takeAction($record)
     {
-        $this->renew($record);
+        $record = $this->renew($record);
 
-        $this->blacklist($record);
+        $record = $this->blacklist($record);
 
         $this->notify($record);
 

@@ -21,7 +21,6 @@ class Mail extends BaseChannel implements Contract
             ->from(
                 config('firewall.notifications.from.address'),
                 config('firewall.notifications.from.name')
-                //.' '.config('firewall.notifications.from.icon_emoji')
             )
             ->subject(config('firewall.notifications.message.request_count.title'))
             ->line(sprintf(
@@ -31,8 +30,9 @@ class Mail extends BaseChannel implements Contract
                 (string) $item['firstRequestAt']
             ))
             ->line(config('firewall.notifications.message.uri.title').': '.$item['server']['REQUEST_URI'])
+            ->line(config('firewall.notifications.message.ip_address.title').': '.$item['ipAddress'])
             ->line(config('firewall.notifications.message.user_agent.title').': '.$item['userAgent'])
-            ->line(config('firewall.notifications.message.blacklisted.title').': '.$item['isBlacklisted'] ? 'YES' : 'NO');
+            ->line(config('firewall.notifications.message.blacklisted.title').': '.($item['isBlacklisted'] ? 'YES' : 'NO'));
 
         if ($item['geoIp']) {
             $geo = $this->makeGeolocation($item);
