@@ -89,7 +89,7 @@ class AttackBlocker
 
                 $this->firewall->blacklist($ipAddress, $blackWhitelisted);
 
-                $record = $this->save($record['type'], ['isBlackListed' => true]);
+                $record = $this->save($record['type'], ['isBlacklisted' => true]);
             }
         }
 

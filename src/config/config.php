@@ -245,7 +245,7 @@ return [
             ],
 
             'blacklisted' => [
-                'title' => 'Was it blacklisted?',
+                'title' => 'Blacklisted',
             ],
 
             'user_agent' => [
