@@ -20,8 +20,8 @@ class Mail extends BaseChannel implements Contract
         $message = (new MailMessage())
             ->from(
                 config('firewall.notifications.from.address'),
-                config('firewall.notifications.from.name').' '.
-                config('firewall.notifications.from.icon_emoji')
+                config('firewall.notifications.from.name')
+                //.' '.config('firewall.notifications.from.icon_emoji')
             )
             ->subject(config('firewall.notifications.message.request_count.title'))
             ->line(sprintf(
